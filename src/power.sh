@@ -52,7 +52,7 @@ boot() {
 
 ready() {
 
-  [ -f "$STORAGE/windows.boot" ] && return 0
+  [ -f "$STORAGE/lin.boot" ] && return 0
   [ ! -s "$QEMU_PTY" ] && return 1
 
   if [[ "${BOOT_MODE,,}" == "windows_legacy" ]]; then
@@ -91,10 +91,10 @@ finish() {
     done
   fi
 
-  if [ ! -f "$STORAGE/windows.boot" ] && [ -f "$BOOT" ]; then
+  if [ ! -f "$STORAGE/lin.boot" ] && [ -f "$BOOT" ]; then
     # Remove CD-ROM ISO after install
     if ready; then
-      touch "$STORAGE/windows.boot"
+      touch "$STORAGE/lin.boot"
       if [[ "$REMOVE" != [Nn]* ]]; then
         rm -f "$BOOT" 2>/dev/null || true
       fi
