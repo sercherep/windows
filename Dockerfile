@@ -1,7 +1,8 @@
 ARG VERSION_ARG="latest"
 FROM scratch AS build-amd64
 
-COPY --from=qemux/qemu:7.02 / /
+#COPY --from=qemux/qemu:7.02 / /
+COPY --from=iqemux
 
 ARG DEBCONF_NOWARNINGS="yes"
 ARG DEBIAN_FRONTEND="noninteractive"
