@@ -11,8 +11,8 @@ skipInstall() {
 
   local iso="$1"
   local magic byte
-  local boot="$STORAGE/windows.boot"
-  local previous="$STORAGE/windows.base"
+  local boot="$STORAGE/lin.boot"
+  local previous="$STORAGE/lin.base"
 
   if [ -f "$previous" ]; then
     previous=$(<"$previous")
@@ -116,52 +116,52 @@ finishInstall() {
     fi
   fi
 
-  rm -f "$STORAGE/windows.old"
-  rm -f "$STORAGE/windows.vga"
-  rm -f "$STORAGE/windows.args"
-  rm -f "$STORAGE/windows.base"
-  rm -f "$STORAGE/windows.boot"
-  rm -f "$STORAGE/windows.mode"
-  rm -f "$STORAGE/windows.type"
+  rm -f "$STORAGE/lin.old"
+  rm -f "$STORAGE/lin.vga"
+  rm -f "$STORAGE/lin.args"
+  rm -f "$STORAGE/lin.base"
+  rm -f "$STORAGE/lin.boot"
+  rm -f "$STORAGE/lin.mode"
+  rm -f "$STORAGE/lin.type"
 
-  cp -f /run/version "$STORAGE/windows.ver"
+  cp -f /run/version "$STORAGE/lin.ver"
 
   if [[ "$iso" == "$STORAGE/"* ]]; then
     if [[ "$aborted" != [Yy1]* ]] || [ -z "$CUSTOM" ]; then
       base=$(basename "$iso")
-      echo "$base" > "$STORAGE/windows.base"
+      echo "$base" > "$STORAGE/lin.base"
     fi
   fi
 
   if [[ "${PLATFORM,,}" == "x64" ]]; then
     if [[ "${BOOT_MODE,,}" == "windows_legacy" ]]; then
-      echo "$BOOT_MODE" > "$STORAGE/windows.mode"
+      echo "$BOOT_MODE" > "$STORAGE/lin.mode"
       if [[ "${MACHINE,,}" != "q35" ]]; then
-        echo "$MACHINE" > "$STORAGE/windows.old"
+        echo "$MACHINE" > "$STORAGE/lin.old"
       fi
     else
       # Enable secure boot + TPM on manual installs as Win11 requires
       if [[ "$MANUAL" == [Yy1]* ]] || [[ "$aborted" == [Yy1]* ]]; then
         if [[ "${DETECTED,,}" == "win11"* ]]; then
           BOOT_MODE="windows_secure"
-          echo "$BOOT_MODE" > "$STORAGE/windows.mode"
+          echo "$BOOT_MODE" > "$STORAGE/lin.mode"
         fi
       fi
       # Enable secure boot on multi-socket systems to workaround freeze
       if [ -n "$SOCKETS" ] && [[ "$SOCKETS" != "1" ]]; then
         BOOT_MODE="windows_secure"
-        echo "$BOOT_MODE" > "$STORAGE/windows.mode"
+        echo "$BOOT_MODE" > "$STORAGE/lin.mode"
       fi
     fi
   fi
 
   if [ -n "${ARGS:-}" ]; then
     ARGUMENTS="$ARGS ${ARGUMENTS:-}"
-    echo "$ARGS" > "$STORAGE/windows.args"
+    echo "$ARGS" > "$STORAGE/lin.args"
   fi
 
   if [ -n "${DISK_TYPE:-}" ] && [[ "${DISK_TYPE:-}" != "scsi" ]]; then
-    echo "$DISK_TYPE" > "$STORAGE/windows.type"
+    echo "$DISK_TYPE" > "$STORAGE/lin.type"
   fi
 
   rm -rf "$TMP"
@@ -226,7 +226,7 @@ detectCustom() {
 
   ISO="$file"
   CUSTOM="$ISO"
-  BOOT="$STORAGE/windows.$size.iso"
+  BOOT="$STORAGE/lin.$size.iso"
 
   return 0
 }
@@ -1004,21 +1004,21 @@ bootWindows() {
 
   rm -rf "$TMP"
 
-  if [ -f "$STORAGE/windows.args" ]; then
-    ARGS=$(<"$STORAGE/windows.args")
+  if [ -f "$STORAGE/lin.args" ]; then
+    ARGS=$(<"$STORAGE/lin.args")
     ARGUMENTS="$ARGS ${ARGUMENTS:-}"
   fi
 
-  if [ -s "$STORAGE/windows.type" ] && [ -f "$STORAGE/windows.type" ]; then
-    [ -z "${DISK_TYPE:-}" ] && DISK_TYPE=$(<"$STORAGE/windows.type")
+  if [ -s "$STORAGE/lin.type" ] && [ -f "$STORAGE/lin.type" ]; then
+    [ -z "${DISK_TYPE:-}" ] && DISK_TYPE=$(<"$STORAGE/lin.type")
   fi
 
-  if [ -s "$STORAGE/windows.mode" ] && [ -f "$STORAGE/windows.mode" ]; then
-    BOOT_MODE=$(<"$STORAGE/windows.mode")
+  if [ -s "$STORAGE/lin.mode" ] && [ -f "$STORAGE/lin.mode" ]; then
+    BOOT_MODE=$(<"$STORAGE/lin.mode")
   fi
 
-  if [ -s "$STORAGE/windows.old" ] && [ -f "$STORAGE/windows.old" ]; then
-    [[ "${PLATFORM,,}" == "x64" ]] && MACHINE=$(<"$STORAGE/windows.old")
+  if [ -s "$STORAGE/lin.old" ] && [ -f "$STORAGE/lin.old" ]; then
+    [[ "${PLATFORM,,}" == "x64" ]] && MACHINE=$(<"$STORAGE/lin.old")
   fi
 
   return 0
